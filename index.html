@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Big Sky Software — independent AI consultancy and engineering. I help founders and technical leaders design, build, and ship AI systems that work in production.">
+  <link rel="canonical" href="https://bigsky-software.com/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bigsky-software.com/">
+  <meta property="og:title" content="Big Sky Software">
+  <meta property="og:description" content="Independent AI consultancy. Strategy, architecture, and engineering for teams serious about AI.">
+  <meta property="og:image" content="https://bigsky-software.com/og.png">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Big Sky Software">
+  <meta name="twitter:description" content="Independent AI consultancy. Strategy, architecture, and engineering for teams serious about AI.">
+  <meta name="twitter:image" content="https://bigsky-software.com/og.png">
+  <title>Big Sky Software</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.92em' font-size='78' fill='%231e3a8a' font-family='Georgia,serif' font-style='italic'>B</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
+  <style>
+    :root {
+      --bg:          #faf9f7;
+      --bg-intro:    #0c111a;
+      --ink:         #1c1917;
+      --ink-muted:   #7c7167;
+      --sky:         #1e3a8a;
+      --sky-bright:  #2563eb;
+      --intro-text:  #e8e3da;
+      --rule:        rgba(28, 25, 23, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Libre Baskerville', 'Baskerville', 'Georgia', serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "liga" 1, "kern" 1;
+    }
+
+    ::selection {
+      background: rgba(37, 99, 235, 0.12);
+    }
+
+    /* ── INTRO SCREEN ──────────────────────────────── */
+
+    .intro-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-intro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 1.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .intro-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro-wordmark {
+      font-size: clamp(32px, 6.5vw, 68px);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      color: var(--intro-text);
+      text-shadow: 0 0 80px rgba(59, 130, 246, 0.15);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2.5px;
+      height: 0.8em;
+      background: var(--intro-text);
+      margin-left: 3px;
+      vertical-align: baseline;
+      border-radius: 1px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .cursor.visible {
+      opacity: 1;
+      animation: blink 1.1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── SKIP BUTTON ───────────────────────────────── */
+
+    .skip-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 200;
+      background: transparent;
+      color: rgba(232, 227, 218, 0.35);
+      border: 1px solid rgba(232, 227, 218, 0.18);
+      padding: 7px 15px;
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .skip-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .skip-btn:hover {
+      color: rgba(232, 227, 218, 0.75);
+      border-color: rgba(232, 227, 218, 0.4);
+    }
+
+    /* ── MAIN CONTENT ──────────────────────────────── */
+
+    .main-content {
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+
+    .main-content.show {
+      opacity: 1;
+    }
+
+    .container {
+      min-height: 100vh;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: clamp(52px, 10vh, 108px) clamp(24px, 5vw, 52px) clamp(40px, 6vh, 72px);
+    }
+
+    /* ── WORDMARK ──────────────────────────────────── */
+
+    .wordmark {
+      font-size: clamp(26px, 4.5vw, 42px);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      color: var(--sky);
+      margin-bottom: clamp(52px, 9vh, 88px);
+    }
+
+    /* ── SECTIONS ──────────────────────────────────── */
+
+    .section {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── TAGLINE ───────────────────────────────────── */
+
+    .tagline {
+      font-size: clamp(18px, 3.2vw, 24px);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-weight: 400;
+      line-height: 1.45;
+      margin-bottom: clamp(32px, 5vh, 52px);
+    }
+
+    /* ── BODY PARAGRAPHS ───────────────────────────── */
+
+    .body {
+      font-size: clamp(15.5px, 2.2vw, 17.5px);
+      line-height: 1.8;
+      color: var(--ink);
+    }
+
+    .body + .body {
+      margin-top: 0.95em;
+    }
+
+    /* ── INLINE HIGHLIGHT ──────────────────────────── */
+
+    .hl {
+      position: relative;
+      display: inline;
+      white-space: nowrap;
+    }
+
+    .hl::after {
+      content: '';
+      position: absolute;
+      bottom: 1px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--sky-bright);
+      opacity: 0.6;
+      transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      transition-delay: 0.35s;
+    }
+
+    .hl.on::after {
+      width: 100%;
+    }
+
+    /* ── SIGNATURE ─────────────────────────────────── */
+
+    .signature {
+      font-size: clamp(22px, 4vw, 34px);
+      font-style: italic;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-top: 1.8em;
+      color: var(--ink);
+    }
+
+    .signature .w {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .signature .w.on {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .signature .w.sky {
+      color: var(--sky);
+    }
+
+    /* ── CONTACT / FOOTER ──────────────────────────── */
+
+    .contact {
+      margin-top: clamp(44px, 7vh, 72px);
+      padding-top: 1.4em;
+      border-top: 1px solid var(--rule);
+      font-size: clamp(13.5px, 1.9vw, 15.5px);
+      color: var(--ink-muted);
+      display: flex;
+      align-items: baseline;
+      gap: 0.45em;
+      flex-wrap: wrap;
+    }
+
+    .contact a {
+      color: var(--ink);
+      text-decoration: none;
+      padding-bottom: 1px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.22s ease, border-color 0.22s ease;
+    }
+
+    .contact a:hover {
+      color: var(--sky-bright);
+      border-bottom-color: var(--sky-bright);
+    }
+
+    .contact .copy {
+      margin-left: auto;
+      font-size: 12px;
+      color: rgba(28, 25, 23, 0.28);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────── */
+
+    @media (max-width: 480px) {
+      .contact {
+        flex-direction: column;
+        gap: 0.25em;
+      }
+      .contact .copy {
+        margin-left: 0;
+        margin-top: 0.5em;
+      }
+      .hl { white-space: normal; }
+    }
+
+    /* ── REDUCED MOTION ────────────────────────────── */
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Intro -->
+  <div class="intro-screen" id="intro-screen">
+    <div class="intro-wordmark">
+      <span id="type-target"></span><span class="cursor" id="cursor"></span>
+    </div>
+  </div>
+
+  <!-- Skip -->
+  <button class="skip-btn" id="skip-btn" onclick="skipAnimation()">Skip</button>
+
+  <!-- Main -->
+  <div class="main-content" id="main-content">
+    <div class="container">
+
+      <header>
+        <h1 class="wordmark section" id="s-wordmark">Big Sky Software,</h1>
+      </header>
+
+      <main>
+        <div class="section" id="s-tagline">
+          <p class="tagline">Independent AI consultancy.</p>
+        </div>
+
+        <div class="section body" id="s-1">
+          <p>I help companies build <span class="hl">AI systems that matter</span>. From strategy and architecture to hands-on engineering — I work across the full stack of modern AI: language models, retrieval systems, evaluation pipelines, and the infrastructure that holds it all together in production.</p>
+        </div>
+
+        <div class="section body" id="s-2">
+          <p>Most AI projects stall because the hard parts are underestimated. The model is ten percent of the work. I bring rigorous engineering discipline to the other ninety — <span class="hl">prompt design, grounding, evals, latency, cost</span>, and the careful integration that turns a promising demo into software people trust.</p>
+        </div>
+
+        <div class="section body" id="s-3">
+          <p>I work with founders and technical leaders who want to move deliberately — with honesty about what AI can and cannot do, and the craft to <span class="hl">build it right the first time</span>. Engagements are small and serious: strategy, architecture, embedded engineering, or all three.</p>
+
+          <p class="signature" id="signature" aria-label="Code and craft.">
+            <span class="w">Code</span><span class="w sky">&thinsp;&amp;&thinsp;</span><span class="w">craft.</span>
+          </p>
+        </div>
+
+        <footer class="contact section" id="s-contact">
+          <span>Ready to talk AI —</span>
+          <a href="mailto:founder@bigsky.software">founder@bigsky.software</a>
+          <span class="copy">© 2026</span>
+        </footer>
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── Skip ─────────────────────────────────────── */
+    function skipAnimation() {
+      document.getElementById('intro-screen').style.display = 'none';
+      document.getElementById('skip-btn').style.display = 'none';
+      showAll();
+    }
+
+    function showAll() {
+      document.getElementById('main-content').classList.add('show');
+      document.querySelectorAll('.section').forEach(el => el.classList.add('show'));
+      setTimeout(() => {
+        document.querySelectorAll('.hl').forEach(el => el.classList.add('on'));
+        animateSig();
+      }, 80);
+    }
+
+    if (reduced) {
+      skipAnimation();
+    } else {
+      runIntro();
+    }
+
+    /* ── Intro sequence ───────────────────────────── */
+    function runIntro() {
+      const TEXT = "Big Sky Software,";
+      const target = document.getElementById('type-target');
+      const cursor = document.getElementById('cursor');
+      const skipBtn = document.getElementById('skip-btn');
+      let i = 0;
+
+      setTimeout(() => skipBtn.classList.add('visible'), 1400);
+
+      setTimeout(type, 500);
+
+      function type() {
+        if (i < TEXT.length) {
+          target.textContent += TEXT[i++];
+          const ch = TEXT[i - 1];
+          const delay = ch === ',' ? 260 : ch === ' ' ? 90 : Math.random() * 55 + 38;
+          setTimeout(type, delay);
+        } else {
+          cursor.classList.add('visible');
+          setTimeout(fadeOut, 1700);
+        }
+      }
+
+      function fadeOut() {
+        skipBtn.classList.remove('visible');
+        document.getElementById('intro-screen').classList.add('fade-out');
+
+        // Reveal content after intro fades
+        setTimeout(() => {
+          document.getElementById('main-content').classList.add('show');
+          revealSections();
+        }, 950);
+      }
+    }
+
+    /* ── Staggered reveal ─────────────────────────── */
+    function revealSections() {
+      const order = ['s-wordmark', 's-tagline', 's-1', 's-2', 's-3', 's-contact'];
+
+      order.forEach((id, idx) => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.classList.add('show');
+
+          // Draw underlines after section appears
+          el.querySelectorAll('.hl').forEach((hl, j) => {
+            setTimeout(() => hl.classList.add('on'), j * 220 + 380);
+          });
+
+          if (id === 's-3') setTimeout(animateSig, 650);
+        }, idx * 320);
+      });
+    }
+
+    /* ── Signature spring ─────────────────────────── */
+    function animateSig() {
+      document.querySelectorAll('#signature .w').forEach((w, i) => {
+        setTimeout(() => w.classList.add('on'), i * 180);
+      });
+    }
+
+    /* ── Subtle ambient mouse glow (pointer devices only) ── */
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      let cx = mx, cy = my;
+
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+      (function tick() {
+        cx += (mx - cx) * 0.055;
+        cy += (my - cy) * 0.055;
+
+        const xr = cx / window.innerWidth;
+        const yr = cy / window.innerHeight;
+
+        const h = 210 + xr * 18;
+        const s = 25 + xr * 12;
+        const l = 97.8 + yr * 1.4;
+
+        document.body.style.background = `hsl(${h},${s}%,${l}%)`;
+        requestAnimationFrame(tick);
+      })();
+    }
+  </script>
+</body>
+</html>
